@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Avanzada: Fibra Óptica y Enlaces</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #2d3748;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 750px;
+            background: #ffffff;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        h1 {
+            color: #1a365d;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        h3 {
+            text-align: center;
+            color: #4a5568;
+            margin-top: 0;
+            font-weight: 400;
+        }
+        .student-info {
+            background-color: #ebf8ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #bee3f8;
+        }
+        .student-info input {
+            width: 95%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+        }
+        .record-box {
+            background-color: #edf2f7;
+            padding: 10px;
+            border-left: 5px solid #3182ce;
+            margin-bottom: 25px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+        .question {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+        .question p {
+            font-weight: 600;
+            color: #2d3748;
+            margin-top: 0;
+        }
+        label {
+            display: block;
+            margin: 10px 0;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            border: 1px solid transparent;
+        }
+        label:hover {
+            background-color: #f7fafc;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        /* Clases de retroalimentación en las preguntas */
+        .correct-answer {
+            background-color: #c6f6d5 !important;
+            border-color: #38a169 !important;
+            color: #22543d;
+            font-weight: bold;
+        }
+        .incorrect-selection {
+            background-color: #fed7d7 !important;
+            border-color: #e53e3e !important;
+            color: #742a2a;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        button {
+            flex: 1;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-calc { background-color: #3182ce; }
+        .btn-calc:hover { background-color: #2b6cb0; }
+        .btn-classroom { background-color: #38a169; display: none; }
+        .btn-classroom:hover { background-color: #2f855a; }
+        
+        /* Zona de Resultados Mejorada */
+        #resultZone {
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 8px;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .result-header {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid currentColor;
+            padding-bottom: 10px;
+        }
+        .progress-bar-container {
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            height: 20px;
+            width: 100%;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        .feedback-summary {
+            margin-top: 15px;
+            font-size: 0.95em;
+        }
+        .feedback-item {
+            margin-bottom: 8px;
+            padding-left: 15px;
+            border-left: 3px solid #e53e3e;
+        }
+
+        /* Paleta de estados de la zona de resultados */
+        .score-bad { background-color: #fff5f5; color: #9b2c2c; border: 1px solid #feb2b2; }
+        .score-regular { background-color: #fffaf0; color: #dd6b20; border: 1px solid #fbd38d; }
+        .score-good { background-color: #f0fff4; color: #22543d; border: 1px solid #9ae6b4; }
+
+        #classroomPayload {
+            margin-top: 15px;
+            width: 100%;
+            height: 160px;
+            font-family: monospace;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e0;
+            background: #f7fafc;
+            display: none;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Telecomunicaciones: Especialidad Fibra Óptica</h1>
+    <h3>Evaluación Técnica y de Planta Externa</h3>
+    
+    <div class="record-box" id="recordDisplay">
+        Puntaje Máximo Histórico: Cargando...
+    </div>
+
+    <div class="student-info">
+        <label for="studentName"><strong>Nombre Completo del Estudiante:</strong></label>
+        <input type="text" id="studentName" placeholder="Ej. Juan Pérez">
+    </div>
+
+    <form id="quizForm">
+        <div class="question" id="box-q1">
+            <p>1. ¿Cuál es el diámetro estándar del núcleo de una fibra óptica Monomodo (SMF)?</p>
+            <label><input type="radio" name="q1" value="0"> 50 µm</label>
+            <label><input type="radio" name="q1" value="1"> 9 µm</label>
+            <label><input type="radio" name="q1" value="0"> 62.5 µm</label>
+        </div>
+
+        <div class="question" id="box-q2">
+            <p>2. ¿Qué fenómeno físico produce el ensanchamiento de los pulsos de luz en fibras Multimodo limitando la distancia?</p>
+            <label><input type="radio" name="q2" value="1"> Dispersión Modal</label>
+            <label><input type="radio" name="q2" value="0"> Atenuación por Absorción</label>
+            <label><input type="radio" name="q2" value="0"> Reflexión Externa</label>
+        </div>
+
+        <div class="question" id="box-q3">
+            <p>3. En la ventana de operación de 1550 nm en fibra Monomodo, ¿cuál es el valor comercial típico de atenuación?</p>
+            <label><input type="radio" name="q3" value="0"> 3.5 dB/km</label>            <label><input type="radio" name="q3" value="0"> 1.0 dB/km</label>
+            <label><input type="radio" name="q3" value="1"> 0.2 a 0.25 dB/km</label>
+        </div>
+
+        <div class="question" id="box-q4">
+            <p>4. ¿Por qué las fibras Multimodo son preferidas en Redes de Datos Locales (LAN) y Data Centers?</p>
+            <label><input type="radio" name="q4" value="0"> Porque cubren distancias de hasta 40 km sin repetidores.</label>
+            <label><input type="radio" name="q4" value="1"> Porque los componentes activos (LED/VCSEL) y conectores son más económicos.</label>
+            <label><input type="radio" name="q4" value="0"> Porque son inmunes a la dispersión cromática.</label>
+        </div>
+
+        <div class="question" id="box-q5">
+            <p>5. Si un enlace de fibra Monomodo mide 30 km y su atenuación es de 0.3 dB/km, ¿cuál es la pérdida total del hilo de fibra?</p>
+            <label><input type="radio" name="q5" value="0"> 0.9 dB</label>
+            <label><input type="radio" name="q5" value="1"> 9.0 dB</label>
+            <label><input type="radio" name="q5" value="0"> 90 dB</label>
+        </div>
+
+        <div class="question" id="box-q6">
+            <p>6. ¿Qué tipo de conector óptico se caracteriza por tener un cuerpo cilíndrico metálico con fijación por bayoneta (frecuente en redes industriales MMF)?</p>
+            <label><input type="radio" name="q6" value="0"> SC</label>
+            <label><input type="radio" name="q6" value="0"> LC</label>
+            <label><input type="radio" name="q6" value="1"> ST</label>
+        </div>
+
+        <div class="question" id="box-q7">
+            <p>7. Al realizar un Balance de Potencia (Power Budget), ¿para qué se incluye un "Margen de Seguridad"?</p>
+            <label><input type="radio" name="q7" value="1"> Para prever futuras degradaciones, reparaciones o fusiones por cortes en la ruta.</label>
+            <label><input type="radio" name="q7" value="0"> Para aumentar la velocidad de transmisión del láser.</label>
+            <label><input type="radio" name="q7" value="0"> Para compensar los errores de configuración de IP en los routers.</label>
+        </div>
+
+        <div class="question" id="box-q8">
+            <p>8. Un emisor óptico inyecta una potencia de 0 dBm. Si las pérdidas totales del enlace (fibra + conectores + empalmes) suman 12 dB, ¿cuál es la potencia que llegará al receptor?</p>
+            <label><input type="radio" name="q8" value="0"> 12 dBm</label>
+            <label><input type="radio" name="q8" value="1"> -12 dBm</label>
+            <label><input type="radio" name="q8" value="0"> 0.12 dBm</label>
+        </div>
+
+        <div class="question" id="box-q9">
+            <p>9. ¿Cuál de los siguientes colores normalizados identifica generalmente a los Jumpers/Cordones de fibra Monomodo según los estándares de planta interna?</p>
+            <label><input type="radio" name="q9" value="1"> Amarillo</label>
+            <label><input type="radio" name="q9" value="0"> Naranja</label>
+            <label><input type="radio" name="q9" value="0"> Celeste (Aqua)</label>
+        </div>
+
+        <div class="question" id="box-q10">
+            <p>10. ¿Cuál es el método de empalme que ofrece la menor pérdida de inserción (típicamente menor a 0.05 dB) en redes de alta velocidad?</p>
+            <label><input type="radio" name="q10" value="0"> Empalme Mecánico</label>
+            <label><input type="radio" name="q10" value="1"> Empalme por Fusión (Arco Eléctrico)</label>
+            <label><input type="radio" name="q10" value="0"> Conectorización Rápida en Frío</label>
+        </div>
+
+        <div class="question" id="box-q11">
+            <p>11. ¿Cuál es la principal fuente de luz utilizada actualmente en los transceptores modernos para fibra Multimodo OM3 y OM4 debido a su ancho de banda?</p>
+            <label><input type="radio" name="q11" value="0"> LED estándar de montaje superficial</label>
+            <label><input type="radio" name="q11" value="1"> Láser VCSEL (Láser de Emisión Superficial con Cavidad Vertical)</label>
+            <label><input type="radio" name="q11" value="0"> Láser DFB (Retroalimentación Distribuida) de alta potencia</label>
+        </div>
+
+        <div class="question" id="box-q12">
+            <p>12. ¿Qué estándar internacional de la ITU-T define las características de la fibra Monomodo convencional (dispersión no desplazada), que es la más instalada en el mundo?</p>
+            <label><input type="radio" name="q12" value="1"> ITU-T G.652</label>
+            <label><input type="radio" name="q12" value="0"> ITU-T G.651.1</label>
+            <label><input type="radio" name="q12" value="0"> ITU-T G.657</label>
+        </div>
+
+        <div class="question" id="box-q13">
+            <p>13. ¿Qué color externo identifica a un cable de parcheo (jumper) de fibra Multimodo optimizada para láser del tipo OM3 o OM4?</p>
+            <label><input type="radio" name="q13" value="0"> Amarillo</label>
+            <label><input type="radio" name="q13" value="0"> Naranja</label>
+            <label><input type="radio" name="q13" value="1"> Celeste (Aqua)</label>
+        </div>
+
+        <div class="question" id="box-q14">
+            <p>14. ¿Cuál es el diámetro nominal estándar de la capa de revestimiento (cladding) tanto para la fibra Monomodo como para la Multimodo?</p>
+            <label><input type="radio" name="q14" value="1"> 125 µm</label>
+            <label><input type="radio" name="q14" value="0"> 250 µm</label>
+            <label><input type="radio" name="q14" value="0"> 900 µm</label>
+        </div>
+
+        <div class="question" id="box-q15">
+            <p>15. ¿Qué tipo de perfil de índice de refracción se utiliza en las fibras Multimodo modernas (OM2 a OM5) para minimizar la dispersión modal?</p>
+            <label><input type="radio" name="q15" value="0"> Índice Escalonado (Step-index)</label>
+            <label><input type="radio" name="q15" value="1"> Índice Gradual (Graded-index)</label>
+            <label><input type="radio" name="q15" value="0"> Índice de Dispersión Desplazada</label>
+        </div>
+
+        <div class="question" id="box-q16">
+            <p>16. ¿Cuál es la causa principal de que una fibra Monomodo no sufra de Dispersión Modal?</p>
+            <label><input type="radio" name="q16" value="0"> Porque el revestimiento absorbe los rayos de luz secundarios.</label>
+            <label><input type="radio" name="q16" value="1"> Porque su núcleo es tan estrecho que la luz sólo puede viajar en un único camino axial.</label>
+            <label><input type="radio" name="q16" value="0"> Porque opera únicamente con longitudes de onda visibles.</label>
+        </div>
+
+        <div class="question" id="box-q17">
+            <p>17. ¿Cuáles son las ventanas de operación (longitudes de onda) típicas utilizadas para la transmisión en fibra Multimodo?</p>
+            <label><input type="radio" name="q17" value="1"> 850 nm y 1300 nm</label>
+            <label><input type="radio" name="q17" value="0"> 1310 nm y 1550 nm</label>
+            <label><input type="radio" name="q17" value="0"> 1490 nm y 1625 nm</label>
+        </div>
+
+        <div class="question" id="box-q18">
+            <p>18. Si se conecta por error un cable Jumper Monomodo (núcleo de 9 µm) para enviar señal hacia un cable troncal Multimodo (núcleo de 50 µm), ¿qué ocurre físicamente con la luz?</p>
+            <label><input type="radio" name="q18" value="1"> La luz pasa con relativa facilidad al núcleo más grande, generando baja pérdida de acoplamiento.</label>
+            <label><input type="radio" name="q18" value="0"> Se produce una pérdida masiva e inmediata de acoplamiento superior a los 20 dB.</label>
+            <label><input type="radio" name="q18" value="0"> El pulso de luz retrocede por completo destruyendo el transceptor emisor.</label>
+        </div>
+
+        <div class="question" id="box-q19">
+            <p>19. ¿Qué ventaja crítica ofrece la especificación Monomodo ITU-T G.657 con respecto a las fibras Monomodo tradicionales?</p>
+            <label><input type="radio" name="q19" value="0"> Permite velocidades de hasta 1 Terabit por segundo en un solo canal.</label>
+            <label><input type="radio" name="q19" value="1"> Es insensible a las curvas (macrocurvado), ideal para instalaciones FTTH domésticas.</label>
+            <label><input type="radio" name="q19" value="0"> Elimina por completo la atenuación por absorción del agua.</label>
+        </div>
+
+        <div class="question" id="box-q20">
+            <p>20. ¿Qué limitación física principal afecta la distancia máxima y tasa de datos en una fibra Monomodo a muy largas distancias?</p>
+            <label><input type="radio" name="q20" value="0"> Dispersión de Modos de Polarización únicamente.</label>
+            <label><input type="radio" name="q20" value="1"> Dispersión Cromática (material y guía de onda) y la Atenuación.</label>
+            <label><input type="radio" name="q20" value="0"> Pérdida por inserción de conectores mecánicos.</label>
+        </div>
+
+        <div class="btn-group">
+            <button type="button" class="btn-calc" onclick="procesarEvaluacion()">Evaluar Cuestionario</button>
+            <button type="button" id="btnClassroom" class="btn-classroom" onclick="generarReporteClassroom()">Preparar Entrega para Classroom</button>
+        </div>
+    </form>
+
+    <div id="resultZone">
+        <div class="result-header" id="resultTitle"></div>
+        <div id="resultScore"></div>
+        <div class="progress-bar-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+        <div class="feedback-summary" id="feedbackSummary"></div>
+    </div>
+    
+    <textarea id="classroomPayload" readonly></textarea>
+</div>
+
+<script>
+    const TOTAL_PREGUNTAS = 20;
+    let respuestasDetalladasDocente = []; // Almacena el log para el profesor
+
+    document.addEventListener("DOMContentLoaded", () => {
+        actualizarUI();
+    });
+
+    function actualizarUI() {
+        const record = localStorage.getItem("maxPuntajeOptica");
+        const display = document.getElementById("recordDisplay");
+        if(record !== null) {
+            display.innerText = `Puntaje Máximo Guardado en este equipo: ${record} de ${TOTAL_PREGUNTAS} puntos.`;
+        } else {
+            display.innerText = "No hay registros anteriores guardados en esta máquina.";
+        }
+    }
+
+    function procesarEvaluacion() {
+        const nombre = document.getElementById("studentName").value.trim();
+        if(!nombre) {
+            alert("Por favor, ingresa tu Nombre Completo antes de evaluar.");
+            document.getElementById("studentName").focus();
+            return;
+        }
+
+        let puntos = 0;
+        respuestasDetalladasDocente = [];
+        let erroresListaHTML = "";
+
+        // Remover estilos de evaluaciones previas
+        const todosLosLabels = document.querySelectorAll('.question label');
+        todosLosLabels.forEach(l => l.className = "");
+
+        // Validar y analizar pregunta por pregunta
+        for (let i = 1; i <= TOTAL_PREGUNTAS; i++) {
+            const opciones = document.getElementsByName('q' + i);
+            let respondida = false;
+            let valorSeleccionado = "";
+            let labelSeleccionado = null;
+            let labelCorrecto = null;
+
+            for (const opc of opciones) {
+                if (opc.value === "1") {
+                    labelCorrecto = opc.parentElement;
+                }
+                if (opc.checked) {
+                    valorSeleccionado = opc.value;
+                    labelSeleccionado = opc.parentElement;
+                    respondida = true;
+                }
+            }
+
+            if (!respondida) {
+                alert(`Te falta responder la pregunta número ${i}.`);
+                document.getElementById(`box-q${i}`).scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+
+            // Aplicar estilos visuales en el formulario según el resultado
+            if (valorSeleccionado === "1") {
+                puntos++;
+                labelCorrecto.classList.add('correct-answer');
+                respuestasDetalladasDocente.push(`P${i}: OK`);
+            } else {
+                labelSeleccionado.classList.add('incorrect-selection');
+                labelCorrecto.classList.add('correct-answer');
+                respuestasDetalladasDocente.push(`P${i}: INCORRECTA`);
+                
+                // Extraer el texto de la pregunta para la retroalimentación inferior
+                const textoPregunta = document.getElementById(`box-q${i}`).querySelector('p').innerText;
+                const textoCorrecto = labelCorrecto.innerText.trim();
+                erroresListaHTML += `<div class="feedback-item"><strong>${textoPregunta}</strong><br>❌ Tu respuesta fue incorrecta.<br>✔ <em>Respuesta Correcta:</em> ${textoCorrecto}</div>`;
+            }
+        }
+
+        // Configurar UI de la Zona de Resultados Basado en Rendimiento
+        const resultZone = document.getElementById("resultZone");
+        const resultTitle = document.getElementById("resultTitle");
+        const resultScore = document.getElementById("resultScore");
+        const progressBar = document.getElementById("progressBar");
+        const feedbackSummary = document.getElementById("feedbackSummary");
+
+        const porcentaje = (puntos / TOTAL_PREGUNTAS) * 100;
+        resultZone.style.display = "block";
+        
+        // Asignar colores según nota/porcentaje
+        if (porcentaje < 60) {
+            resultZone.className = "score-bad";
+            resultTitle.innerHTML = `<strong>Necesitas Repasar, ${nombre}</strong>`;
+            progressBar.style.backgroundColor = "#e53e3e";
+        } else if (porcentaje >= 60 && porcentaje < 90) {
+            resultZone.className = "score-regular";
+            resultTitle.innerHTML = `<strong>¡Buen intento, ${nombre}! Buen trabajo.</strong>`;
+            progressBar.style.backgroundColor = "#dd6b20";
+        } else {
+            resultZone.className = "score-good";
+            resultTitle.innerHTML = `<strong>¡Excelente Rendimiento, ${nombre}! Dominas el módulo.</strong>`;
+            progressBar.style.backgroundColor = "#38a169";
+        }
+
+        // Desplegar métricas cuantitativas
+        resultScore.innerHTML = `Puntaje obtenido: <strong>${puntos} de ${TOTAL_PREGUNTAS}</strong> correctas (${porcentaje}% de efectividad).`;
+        progressBar.style.width = `${porcentaje}%`;
+
+        // Añadir revisión de errores cualitativa
+        if (puntos === TOTAL_PREGUNTAS) {
+            feedbackSummary.innerHTML = "<strong>🎉 ¡Perfecto! Respondiste todas las preguntas de forma correcta.</strong>";
+        } else {
+            feedbackSummary.innerHTML = `<h4>🔍 Revisión de puntos a mejorar:</h4>` + erroresListaHTML;
+        }
+
+        // Guardar récord local alternativo
+        const recordActual = localStorage.getItem("maxPuntajeOptica");
+        if (recordActual === null || puntos > parseInt(recordActual)) {
+            localStorage.setItem("maxPuntajeOptica", puntos);
+        }
+        actualizarUI();
+
+        // Mostrar botón de Classroom y auto-scroll a resultados
+        document.getElementById("btnClassroom").style.display = "block";
+        resultZone.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function generarReporteClassroom() {
+        const nombre = document.getElementById("studentName").value;
+        const record = localStorage.getItem("maxPuntajeOptica") || 0;
+        const fecha = new Date().toLocaleString();
+        
+        let reporte = `====================================\n`;
+        reporte += `REPORTE DE EVALUACIÓN AUTOMÁTICA\n`;
+        reporte += `====================================\n`;
+        reporte += `Estudiante: ${nombre}\n`;
+        reporte += `Fecha de Envío: ${fecha}\n`;
+        reporte += `Asignatura: Telecomunicaciones / Planta Externa\n`;
+        reporte += `Puntaje Final: ${record} / ${TOTAL_PREGUNTAS} Puntos (${(record/TOTAL_PREGUNTAS)*100}%)\n`;
+        reporte += `------------------------------------\n`;
+        reporte += `AUDITORÍA DE RESPUESTAS PARA EL DOCENTE:\n`;
+        reporte += `${respuestasDetalladasDocente.join(" | ")}\n`;
+        reporte += `====================================\n`;
+        reporte += `CÓDIGO DE VERIFICACIÓN: FO-${btoa(nombre + '-' + record + '-' + respuestasDetalladasDocente.length)}\n`;
+        reporte += `====================================\n`;
+
+        const textarea = document.getElementById("classroomPayload");
+        textarea.style.display = "block";
+        textarea.value = reporte;
+        textarea.select();
+        
+        alert("¡Reporte listo para auditoría docente! Copia el bloque de texto seleccionado abajo (Ctrl+C) y pégalo en Google Classroom.");
+    }
+</script>
+</body>
+</html>
